@@ -1,6 +1,8 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Dict
 from datetime import timedelta
+
+from toolz import get_in
 
 
 @dataclass
