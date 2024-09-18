@@ -49,5 +49,20 @@ def create_tables():
     connection.commit()
 
 
+def truncate_tables():
+    with (get_db_connection() as connection, connection.cursor() as cursor):
+        cursor.execute('''
+        TRUNCATE TABLE users_answers, answers, questions, users
+        RESTART IDENTITY CASCADE
+        ''')
+
+
+def drop_tables():
+    with (get_db_connection() as connection, connection.cursor() as cursor):
+        cursor.execute('''
+        DROP TABLE IF EXISTS users_answers, answers, questions, users CASCADE
+        ''')
+
+
 if __name__ == "__main__":
     create_tables()
