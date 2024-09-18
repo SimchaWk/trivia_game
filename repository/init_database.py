@@ -1,3 +1,5 @@
+from typing import Set
+
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from config.sql_config import SQL_DATABASE_URI
@@ -50,16 +52,21 @@ def create_tables():
 
 
 def check_if_tables_exist() -> bool:
-    required_tables = {'users', 'questions', 'answers', 'users_answers'}
+    required_tables: Set[str] = {'users', 'questions', 'answers', 'users_answers'}
     with get_db_connection() as connection, connection.cursor() as cursor:
-        cursor.execute("""
-            SELECT COUNT(*) 
-            FROM information_schema.tables 
-            WHERE table_schema = 'public' 
-            AND table_name = ANY(%s)
-        """, (list(required_tables),))
-        count = cursor.fetchone()[0]
-    return count == len(required_tables)
+        try:
+            cursor.execute("""
+                SELECT table_name 
+                FROM information_schema.tables 
+                WHERE table_schema = 'public' 
+                AND table_name = ANY(%s)
+            """, (list(required_tables),))
+
+            existing_tables = {row[0] for row in cursor.fetchall()}
+            return existing_tables == required_tables
+        except Exception as e:
+            print(f"Error checking tables: {e}")
+            return False
 
 
 def create_tables_if_not_exist():
