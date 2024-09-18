@@ -49,6 +49,24 @@ def create_tables():
     connection.commit()
 
 
+def check_if_tables_exist() -> bool:
+    required_tables = {'users', 'questions', 'answers', 'users_answers'}
+    with get_db_connection() as connection, connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM information_schema.tables 
+            WHERE table_schema = 'public' 
+            AND table_name = ANY(%s)
+        """, (list(required_tables),))
+        count = cursor.fetchone()[0]
+    return count == len(required_tables)
+
+
+def create_tables_if_not_exist():
+    if not check_if_tables_exist():
+        create_tables()
+
+
 def truncate_tables():
     with (get_db_connection() as connection, connection.cursor() as cursor):
         cursor.execute('''
