@@ -64,6 +64,7 @@ def check_if_tables_exist() -> bool:
 
             existing_tables = {row[0] for row in cursor.fetchall()}
             return existing_tables == required_tables
+
         except Exception as e:
             print(f"Error checking tables: {e}")
             return False
