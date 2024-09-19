@@ -2,6 +2,8 @@ import pytest
 from services import answer_service, question_service
 from models import Question
 from repository.init_database import get_db_connection
+from services.answer_service import *
+from services.question_service import add_question
 
 
 @pytest.fixture(scope="module")
@@ -22,24 +24,24 @@ def clear_tables(db_connection):
 @pytest.fixture
 def sample_question():
     question = Question(question_text="What is the capital of France?", correct_answer="Paris")
-    question_id = question_service.add_question(question)
+    question_id = add_question(question)
     return question_id
 
 
 def test_add_incorrect_answers(sample_question):
     incorrect_answers = ["London", "Berlin", "Rome"]
-    success = answer_service.add_incorrect_answers(sample_question, incorrect_answers)
+    success = add_incorrect_answers(sample_question, incorrect_answers)
     assert success is True
 
-    retrieved_answers = answer_service.get_answers(sample_question)
+    retrieved_answers = get_answers(sample_question)
     assert set(retrieved_answers) == set(incorrect_answers)
 
 
 def test_get_incorrect_answers(sample_question):
     incorrect_answers = ["Red", "Blue", "Green"]
-    answer_service.add_incorrect_answers(sample_question, incorrect_answers)
+    add_incorrect_answers(sample_question, incorrect_answers)
 
-    retrieved_answers = answer_service.get_answers(sample_question)
+    retrieved_answers = get_answers(sample_question)
     assert set(retrieved_answers) == set(incorrect_answers)
 
 
